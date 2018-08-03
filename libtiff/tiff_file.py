@@ -23,7 +23,7 @@ from .tiff_sample_plane import TiffSamplePlane
 from .tiff_array import TiffArray
 
 from . import lsm
-import tif_lzw
+from . import tif_lzw
 
 IFDEntry_init_hooks = []
 IFDEntry_finalize_hooks = []
@@ -363,7 +363,7 @@ class TIFFfile(TiffBase):
         ----------
         subfile_type : {0, 1, 2, 4}
           Specify subfile type. 0: image, 1: reduced image, 2: single page, 4: transparency mask.
-          
+
         Returns
         -------
         ifd : IFDEntry

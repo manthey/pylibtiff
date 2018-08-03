@@ -81,9 +81,9 @@ if __name__ == '__main__':
     except ImportError:
         numpy = None
 
-    bittools_mod = Extension('bittools',
+    bittools_mod = Extension('libtiff.bittools',
                              sources=['libtiff/src/bittools.c'])
-    tif_lzw_mod = Extension('tif_lzw',
+    tif_lzw_mod = Extension('libtiff.tif_lzw',
                             sources=['libtiff/src/tif_lzw.c'])
     libtiff = Extension('libtiff._tiff', sources=[], libraries=['tiff'])
 

@@ -13,7 +13,7 @@ default_backend='bittools'
 if default_backend=='bitarray':
     from bitarray import bitarray
 if default_backend=='bittools':
-    from bittools import setword, getword
+    from .bittools import setword, getword
 
 CODECLEAR = 256
 CODEEOI = 257

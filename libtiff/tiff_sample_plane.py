@@ -5,7 +5,7 @@
 
 
 import numpy
-import tif_lzw
+from . import tif_lzw
 
 __all__ = ['TiffSamplePlane']
 
@@ -53,7 +53,7 @@ class TiffSamplePlane:
         bits_per_pixel = sum(bits_per_sample)
         assert bits_per_pixel % 8==0, repr((bits_per_pixel, bits_per_sample))
         bytes_per_pixel = bits_per_pixel // 8
-        
+
         if sample_index is None:
             bytes_per_sample = bytes_per_pixel
         else:
@@ -214,7 +214,7 @@ rows_per_strip=%(rows_per_strip)s
             offset = 0
             for strip_index in range (len (self.strip_offsets)):
                 start = self.strip_offsets[strip_index]
-                stop = start +  self.strip_nbytes[strip_index]            
+                stop = start +  self.strip_nbytes[strip_index]
                 if self.compression==1:
                     strip = self.ifd.tiff.data[start:stop]
                 else:
