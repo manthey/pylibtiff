@@ -20,7 +20,7 @@ MICRO = 3
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
-if os.path.exists('MANIFEST'): 
+if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
 
 
@@ -74,12 +74,18 @@ def configuration(parent_package='', top_path=None):
 
 
 if __name__ == '__main__':
-    from numpy.distutils.core import setup, Extension
+    # from numpy.distutils.core import setup, Extension
+    from setuptools import setup, Extension
+    try:
+        import numpy
+    except ImportError:
+        numpy = None
 
     bittools_mod = Extension('bittools',
                              sources=['libtiff/src/bittools.c'])
     tif_lzw_mod = Extension('tif_lzw',
                             sources=['libtiff/src/tif_lzw.c'])
+    libtiff = Extension('libtiff._tiff', sources=[], libraries=['tiff'])
 
     # Rewrite the version file everytime
     if os.path.exists('libtiff/version.py'):
@@ -87,7 +93,7 @@ if __name__ == '__main__':
     write_version_py()
 
     setup(name='libtiff',
-          # version='0.3-svn',
+          version='0.5.0',
           author='Pearu Peterson',
           author_email='pearu.peterson@gmail.com',
           license='https://github.com/pearu/pylibtiff/blob/master/LICENSE',
@@ -102,8 +108,11 @@ PyLibTiff? is a Python package that provides the following modules:
    tiff - a numpy.memmap view of tiff files.
 ''',
           platforms=["All"],
-          # packages = ['libtiff'],
-          # package_dir = {'libtiff': 'libtiff'},
+          packages = ['libtiff'],
+          package_dir = {'libtiff': 'libtiff'},
+          include_dirs = [numpy.get_include()] if numpy else [],
           configuration=configuration,
-          ext_modules=[bittools_mod, tif_lzw_mod], requires=['numpy']
+          install_requires=['numpy'],
+          ext_modules=[bittools_mod, tif_lzw_mod, libtiff],
+          requires=['numpy'],
           )

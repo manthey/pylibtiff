@@ -43,6 +43,25 @@ else:
     else:
         lib = ctypes.util.find_library('tiff')
 if lib is None:
+    libpath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(
+        __file__)), '.libs'))
+    libs = os.listdir(libpath)
+    loadCount = 0
+    while True:
+        numLoaded = 0
+        for name in libs:
+            try:
+                somelib = os.path.join(libpath, name)
+                if name.startswith('libtiff-'):
+                    lib = somelib
+                ctypes.cdll.LoadLibrary(somelib)
+                numLoaded += 1
+            except Exception:
+                pass
+        if numLoaded - loadCount <= 0:
+            break
+        loadCount = numLoaded
+if lib is None:
     raise ImportError('Failed to find TIFF library. Make sure that libtiff '
                       'is installed and its location is listed in '
                       'PATH|LD_LIBRARY_PATH|..')
@@ -67,7 +86,7 @@ if tiff_h is None:
     # WARNING: there is not guarantee that the tiff.h found below will
     # correspond to libtiff version. Although, for clean distros the
     # probability is high.
-    
+
     include_tiff_h = os.path.join(os.path.split(lib)[0], '..', 'include',
                                   'tiff.h')
     if not os.path.isfile(include_tiff_h):
@@ -334,7 +353,7 @@ tifftags = {
     # TIFFTAG_ICCPROFILE              2      uint32*,void**   count,
     #                                                         profile data
 
-    # TIFFTAG: type, conversion  
+    # TIFFTAG: type, conversion
     # 3 uint16* for Set, 3 uint16** for Get; size:(1<<BitsPerSample arrays)
     TIFFTAG_COLORMAP: (ctypes.c_uint16, lambda _d: (
         _d[0].contents[:], _d[1].contents[:], _d[2].contents[:])),
@@ -437,7 +456,7 @@ class TIFF(ctypes.c_void_p):
     To open a tiff file for reading, use
 
       tiff = TIFF.open (filename, more='r')
-      
+
     To read an image from a tiff file, use
 
       image = tiff.read_image()
@@ -861,8 +880,8 @@ class TIFF(ctypes.c_void_p):
             If there's only one sample per pixel, it returns a numpy array with 2 dimensions (x, y)
             if the image has more than one sample per pixel (SamplesPerPixel > 1),
             it will return a numpy array with 3 dimensions. If PlanarConfig == PLANARCONFIG_CONTIG,
-            the returned dimensions will be (x, y, sample_index). 
-            If PlanarConfig == PLANARCONFIG_SEPARATE, 
+            the returned dimensions will be (x, y, sample_index).
+            If PlanarConfig == PLANARCONFIG_SEPARATE,
             the returned dimensions will be (sample_index, x, y).
         """
 
@@ -1528,22 +1547,22 @@ class TIFF(ctypes.c_void_p):
 
 class TIFF3D(TIFF):
     """ subclass of TIFF for handling import of 3D (multi-directory) files.
-    
+
     like TIFF, but TIFF3D.read_image() will attempt to restore a 3D numpy array
     when given a multi-image TIFF file; performing the inverse of
-    
+
     TIFF_instance.write(numpy.zeros((40, 200, 200)))
-    
+
     like so:
-    
+
     arr = TIFF3D_instance.read_image()
     arr.shape # gives (40, 200, 200)
-    
+
     if you tried this with a normal TIFF instance, you would get this:
-    
+
     arr = TIFF_instance.read_image()
     arr.shape # gives (200, 200)
-    
+
     and you would have to loop over each image by hand with TIFF.iter_images().
     """
 
