@@ -42,6 +42,7 @@ if os.path.exists(libpath):
         if numLoaded - loadCount <= 0:
             break
         loadCount = numLoaded
+mayBuildHeader = bool(lib is None)
 if lib is None:
     if os.name == 'nt':
         # assume that the directory of libtiff3.dll is in PATH.
@@ -82,6 +83,8 @@ tiff_h_name = 'tiff_h_%s' % (libtiff_version.replace('.', '_'))
 try:
     exec(u"import libtiff.{0:s} as tiff_h".format(tiff_h_name))
 except ImportError:
+    if not mayBuildHeader:
+        raise
     tiff_h = None
 
 if tiff_h is None:
@@ -107,6 +110,31 @@ if tiff_h is None:
         # Base it off of the python called
         include_tiff_h = os.path.realpath(os.path.join(os.path.split(
             sys.executable)[0], '..', 'include', 'tiff.h'))
+    if not os.path.isfile(include_tiff_h):
+        import subprocess
+        try:
+            pkg_info = subprocess.Popen(
+                ['pkg-config', '--cflags', 'libtiff-4'], stderr=subprocess.PIPE,
+                stdin=open('/dev/null', 'rb')).communicate()[1]
+            pkg_path = pkg_info.split('-I', 1)[1].strip()
+            include_tiff_h = os.path.join(pkg_path, 'tiff.h')
+        except Exception:
+            pass
+    if not os.path.isfile(include_tiff_h):
+        import subprocess
+        try:
+            cpp_info = subprocess.Popen(
+                ['cpp', '-v', '-o', '/dev/null'], stderr=subprocess.PIPE,
+                stdin=open('/dev/null', 'rb')).communicate()[1]
+            cpp_paths = cpp_info.split('#include "..." search starts here:')[1].split('End of search list.')[0].split('\n')
+            for cpp_path in cpp_paths:
+                cpp_path = cpp_path.strip()
+                if cpp_path.startswith('/'):
+                    include_tiff_h = os.path.join(cpp_path, 'tiff.h')
+                    if os.path.isfile(include_tiff_h):
+                        break
+        except Exception:
+            pass
     if not os.path.isfile(include_tiff_h):
         raise ValueError('Failed to find TIFF header file (may be need to '
                          'run: sudo apt-get install libtiff4-dev)')
