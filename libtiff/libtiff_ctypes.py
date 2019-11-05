@@ -111,6 +111,8 @@ if tiff_h is None:
         include_tiff_h = os.path.join(os.path.split(lib)[0], 'include',
                                       'tiff.h')
     if not os.path.isfile(include_tiff_h):
+        include_tiff_h = os.path.join('/usr', 'local', 'include', 'tiff.h')
+    if not os.path.isfile(include_tiff_h):
         # fix me for windows:
         include_tiff_h = os.path.join(sys.prefix, 'include', 'tiff.h')
         # print(include_tiff_h)
