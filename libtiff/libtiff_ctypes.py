@@ -25,6 +25,9 @@ __all__ = ['libtiff', 'TIFF']
 lib = None
 libpath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(
     __file__)), '.libs'))
+if not os.path.exists(libpath):
+    libpath = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(
+        __file__))), 'libtiff.libs'))
 if os.path.exists(libpath):
     libs = os.listdir(libpath)
     loadCount = 0
