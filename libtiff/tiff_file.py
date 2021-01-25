@@ -12,7 +12,7 @@ import sys
 import shutil
 import numpy
 import mmap
-from numpy.testing.utils import memusage
+# from numpy.testing.utils import memusage
 from .tiff_data import type2name, name2type, type2bytes, type2dtype, \
     tag_value2name, tag_name2value
 from .tiff_data import LittleEndianNumpyDTypes, BigEndianNumpyDTypes, \
